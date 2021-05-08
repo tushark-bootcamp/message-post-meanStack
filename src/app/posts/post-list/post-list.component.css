@@ -1,0 +1,10 @@
+:host {
+    /* display: block enables the margin-top: 1 rem to take effect 
+    as all elements by default are not treated as block level elements */
+    display: block;
+    margin-top: 1rem;
+}
+
+.info-text {
+    text-align: centre;
+}
