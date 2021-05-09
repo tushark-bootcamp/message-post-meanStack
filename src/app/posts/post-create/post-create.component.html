@@ -1,27 +1,40 @@
-<!-- <textarea name="" id="" cols="30" rows="6" [value]="'Test'"></textarea> -->
-<!-- <textarea name="" id="" cols="30" rows="6" [value]="newPost" #postInput></textarea> -->
 <mat-card>
-    <!-- <form> -->
+    <!-- Template driven form -->
+    <form
+        (submit)="onAddPost(msgPostForm)"
+        #msgPostForm="ngForm"
+    >
         <mat-form-field>
             <input
                 matInput
                 type="text"
-                [(ngModel)]="enteredTitle"
+                name="title"
+                ngModel
+                required
+                minlength="3"
+                #title="ngModel"
             >
+            <mat-error *ngIf="title.invalid">Please enter a post title</mat-error>
         </mat-form-field>
         <mat-form-field>
             <textarea
                 matInput
-                rows="6"
-                [(ngModel)]="enteredContent"
-            ></textarea>
+                rows="4"
+                name="content"
+                ngModel
+                required
+                minlength="5"
+                #content="ngModel"
+            >
+            </textarea>
+            <mat-error *ngIf="content.invalid">Please enter post content</mat-error>
         </mat-form-field>
         <button
             color="accent"
             mat-raised-button
-            (click)="onAddPost()"
+            type="submit"
         >
             Save Post
         </button>
-    <!-- </form> -->
+    </form>
 </mat-card>
