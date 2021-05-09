@@ -26,5 +26,6 @@ export class PostCreateComponent {
         };
         this.postsService.addPost(post);
         //this.postCreated.emit(post);
+        form.resetForm();
     }
 }
