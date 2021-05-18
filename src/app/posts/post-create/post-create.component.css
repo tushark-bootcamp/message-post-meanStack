@@ -3,6 +3,10 @@
     margin: auto;
 } */
 
+mat-spinner {
+    margin:auto;
+}
+
 mat-form-field,
 textarea {
     width: 100%;

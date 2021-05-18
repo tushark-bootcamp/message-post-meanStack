@@ -15,6 +15,7 @@ export class PostCreateComponent implements OnInit {
     enteredTitle = '';
     enteredContent = '';
     post: Post;
+    isLoading = false;
     //@Output() postCreated = new EventEmitter<Post>();
     private mode = 'create';
     private postId: string;
@@ -26,6 +27,7 @@ export class PostCreateComponent implements OnInit {
         // **Imp note: For all builtin observables, we never need to unsubscribe in ngOnDestroy() {}
         this.route.paramMap.subscribe((paramMap: ParamMap) => {
             if (paramMap.has('postId')) {
+                this.isLoading = true;
                 this.mode = 'edit';
                 this.postId = paramMap.get('postId');
                 this.postsService.getPost(this.postId)
@@ -34,7 +36,10 @@ export class PostCreateComponent implements OnInit {
                             const post: Post = { id: serverPost._id, title: serverPost.title, content: serverPost.content };
                             return post;
                         }))
-                    .subscribe(post => this.post = post);
+                    .subscribe(post => {
+                        this.isLoading = false;
+                        this.post = post;
+                    })
             } else {
                 this.mode = 'create';
                 this.postId = null;
@@ -54,7 +59,6 @@ export class PostCreateComponent implements OnInit {
                 content: form.value.content
             };
             this.postsService.addPost(postCreate);
-            form.resetForm();
             // this.postsService.addPost({
             //     id: null,
             //     title: form.value.title,
@@ -68,6 +72,7 @@ export class PostCreateComponent implements OnInit {
             };
             this.postsService.updatePost(postUpdate);
         }
-        
+        form.resetForm();
+
     }
 }

@@ -3,6 +3,7 @@ import { Post } from './post.model';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 // {providedIn: 'root'} ensures there is a single instance of PostService i.e. Singleton pattern
 @Injectable({ providedIn: 'root' })
@@ -10,7 +11,7 @@ export class PostService {
     private posts: Post[] = []
     private postsUpdated = new Subject<Post[]>();
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private router: Router) { }
 
     getPosts() {
         this.http.get<{ message: string, posts: any }>('http://localhost:3000/api/posts')
@@ -54,6 +55,7 @@ export class PostService {
             updatedPosts[updatedPostIndex] = post;
             this.posts = updatedPosts;
             this.postsUpdated.next([...this.posts]);
+            this.router.navigate(["/"]);
         });
     }
 
@@ -74,6 +76,7 @@ export class PostService {
                 post.id = responseData.postId;
                 this.posts.push(post);
                 this.postsUpdated.next([...this.posts]);
+                this.router.navigate(["/"]);
             });
 
     }
