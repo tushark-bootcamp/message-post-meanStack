@@ -19,7 +19,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     //     this.postsService = postsService;
     // }
 
-    // This way of declaring postsService with a public key work is a short cut to the above method
+    // This way of declaring postsService with a public key work is a shortcut to the above method
     // of declaring constructor
     constructor(public postsService: PostService) { }
 

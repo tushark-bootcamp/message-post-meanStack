@@ -38,6 +38,25 @@ export class PostService {
         return this.postsUpdated.asObservable();
     }
 
+    getPost(id: string) {
+        //return { ...this.posts.find(p => p.id === postId) }
+        return this.http.get<{_id: string, title: string, content: string}>('http://localhost:3000/api/posts/' + id);
+    }
+
+    updatePost(post: Post) {
+        this.http.put<{ message: string }>('http://localhost:3000/api/posts/' + post.id, post)
+        .subscribe((responseData) => {
+            console.log(responseData.message);
+            const updatedPosts = [...this.posts];
+            const updatedPostIndex: number = updatedPosts.findIndex((postIter) => {
+                postIter.id === post.id;
+            });
+            updatedPosts[updatedPostIndex] = post;
+            this.posts = updatedPosts;
+            this.postsUpdated.next([...this.posts]);
+        });
+    }
+
     addPost(post: Post) {
         this.http.post<{ message: string, postId: string }>('http://localhost:3000/api/posts', post)
             // Alternate way to send the transformedPost with an id to .subscriber().    
