@@ -1,7 +1,6 @@
+const path = require("path");
 const express = require("express");
 
-// Depricated as of Express 4.16 onwards
-//const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const postsRoutes = require("./routes/posts");
@@ -15,12 +14,21 @@ const app = express();
 mongoose.connect("mongodb+srv://mean-stack-posts:wLtL7tYR4rFbVBc@cluster0.ttur7.mongodb.net/postsAppDB?retryWrites=true&w=majority")
   .then(() => {
     console.log('Connected to database');
+  })
+  .catch(() => {
+    console.log("Connection failed");
   });
 
+// Depricated as of Express 4.16 onwards
+//const bodyParser = require("body-parser");
 app.use(express.json());
 app.use(express.urlencoded({
   extended: false
-}))
+}));
+
+// The below line ensures the image folder is accessible over http
+app.use("/images", express.static(path.join("backend/images")));
+
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
