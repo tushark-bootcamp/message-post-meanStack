@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const multer = require("multer");
 
@@ -22,6 +23,11 @@ const storage = multer.diskStorage({
     }
     // The path "backend/images" is stored relative to the server.js file
     cb(error, "backend/images");
+    // Refer link
+    // https://stackoverflow.com/questions/48418680/enoent-no-such-file-or-directory/48653921#48653921
+    // To be able to create a folder on fly without having to pre-create
+    //cb(error, path.join(__dirname, "/images"));
+    
   },
   filename: (req, file, cb) => {
     const name = file.originalname.toLowerCase().split(' ').join('-');
