@@ -8,30 +8,39 @@ import { Router } from '@angular/router';
 // {providedIn: 'root'} ensures there is a single instance of PostService i.e. Singleton pattern
 @Injectable({ providedIn: 'root' })
 export class PostService {
-    private posts: Post[] = []
-    private postsUpdated = new Subject<Post[]>();
+    private posts: Post[] = [];
+    private postCount = 0;
+    private postData: {
+        postCount: number,
+        posts: Post[]
+    }
+    private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
 
     constructor(private http: HttpClient, private router: Router) { }
 
-    getPosts() {
-        this.http.get<{ message: string, posts: any }>('http://localhost:3000/api/posts')
+    getPosts(postsPerPage: number, currentPage: number) {
+        const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`
+        this.http.get<{ message: string, posts: any, postCount: number }>("http://localhost:3000/api/posts" + queryParams)
             // the below transformation is required to transform the server side Post model
             // defined in backend/models/post.js where mongoose creates an additional _id field by default.
             .pipe(map((responseData) => {
-                return responseData.posts.map(post => {
-                    return {
-                        title: post.title,
-                        content: post.content,
-                        id: post._id,
-                        imagePath: post.imagePath
-                    }
-                });
+                return {
+                    postCount: responseData.postCount,
+                    posts: responseData.posts.map(post => {
+                        return {
+                            title: post.title,
+                            content: post.content,
+                            id: post._id,
+                            imagePath: post.imagePath
+                        }
+                    })
+                }
             }))
             .subscribe((transformedPosts) => {
                 // console.log('Posts service received the Posts from server');
                 // console.log(transformedPosts);
-                this.posts = transformedPosts;
-                this.postsUpdated.next([...this.posts]);
+                this.posts = transformedPosts.posts;
+                this.postsUpdated.next({ posts: [...this.posts], postCount: transformedPosts.postCount });
             });
         // return [...this.posts];
     }
@@ -65,20 +74,23 @@ export class PostService {
         }
         this.http.put<{ message: string, imagePath: string }>('http://localhost:3000/api/posts/' + id, postData)
             .subscribe((responseData) => {
-                console.log(responseData.message);
-                const updatedPosts = [...this.posts];
-                const updatedPostIndex: number = updatedPosts.findIndex((postIter) => {
-                    postIter.id === id;
-                });
-                const post: Post = {
-                    id: id,
-                    title: title,
-                    content: content,
-                    imagePath: responseData.imagePath
-                }
-                updatedPosts[updatedPostIndex] = post;
-                this.posts = updatedPosts;
-                this.postsUpdated.next([...this.posts]);
+                //** Imp Note: The below code to emit change post event is commented off since we navigate 
+                // back to the root where we reload the posts by calling the getPosts() method from the ngOnInit() method of the post-list.component */
+
+                // console.log(responseData.message);
+                // const updatedPosts = [...this.posts];
+                // const updatedPostIndex: number = updatedPosts.findIndex((postIter) => {
+                //     postIter.id === id;
+                // });
+                // const post: Post = {
+                //     id: id,
+                //     title: title,
+                //     content: content,
+                //     imagePath: responseData.imagePath
+                // }
+                // updatedPosts[updatedPostIndex] = post;
+                // this.posts = updatedPosts;
+                // this.postsUpdated.next([...this.posts]);
                 this.router.navigate(["/"]);
             });
     }
@@ -103,30 +115,25 @@ export class PostService {
             //     }
             // }))
             .subscribe((responseData) => {
+                //** Imp Note: The below code to emit change post event is commented off since we navigate 
+                // back to the root where we reload the posts by calling the getPosts() method from the ngOnInit() method of the post-list.component */
+
                 //console.log(postMongData.message);
-                const post: Post = {
-                    id: responseData.post.id,
-                    title: title,
-                    content: content,
-                    imagePath: responseData.post.imagePath
-                }
-                this.posts.push(post);
-                this.postsUpdated.next([...this.posts]);
+                // const post: Post = {
+                //     id: responseData.post.id,
+                //     title: title,
+                //     content: content,
+                //     imagePath: responseData.post.imagePath
+                // }
+                // this.posts.push(post);
+                // this.postsUpdated.next([...this.posts]);
                 this.router.navigate(["/"]);
             });
 
     }
 
     deletePost(postId: string) {
-        this.http.delete<{ message: string }>('http://localhost:3000/api/posts/' + postId)
-            .subscribe((responseData) => {
-                console.log(responseData.message);
-                const updatedPosts = this.posts.filter((post) => {
-                    return postId !== post.id
-                });
-                this.posts = updatedPosts;
-                this.postsUpdated.next([...this.posts]);
-            });
+        return this.http.delete<{ message: string }>('http://localhost:3000/api/posts/' + postId);
     }
 
 }

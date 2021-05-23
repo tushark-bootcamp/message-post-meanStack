@@ -87,11 +87,30 @@ router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) 
 });
 
 router.get("", (req, res, next) => {
-  Post.find().then(documents => {
+  // sample url to send query params
+  //http://localhost:3000/api/posts?pagesize=2&pageindex=1
+  console.log(req.query);
+  // Use +req instead of req to convert string into number
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  let fetchedPosts;
+  // the below find() method only gets executed when you call the .then()
+  const postQuery = Post.find();
+  if(pageSize && currentPage) {
+    postQuery
+    .skip(pageSize * (currentPage - 1))
+    .limit(pageSize);
+  }
+  postQuery.then(documents => {
     console.log(documents);
+    fetchedPosts = documents;
+    return Post.count();
+  })
+  .then(count => {
     res.status(200).json({
       message: 'Posts fetched successfully',
-      posts: documents
+      posts: fetchedPosts,
+      postCount: count
     });
   });
 });
