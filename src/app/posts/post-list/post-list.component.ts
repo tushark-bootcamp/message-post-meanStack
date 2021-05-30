@@ -3,6 +3,7 @@ import { Post } from '../post.model';
 import { PostService } from '../post.service';
 import { Subscription } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
     selector: 'app-post-list',
@@ -21,13 +22,16 @@ export class PostListComponent implements OnInit, OnDestroy {
     pageSizeOptions = [1, 2, 5, 10];
     private postSubs: Subscription;
 
+    isloggedIn = false;
+    private authStatusSubs: Subscription;
+
     // constructor(postsService: PostService) {
     //     this.postsService = postsService;
     // }
 
     // This way of declaring postsService with a public key work is a shortcut to the above method
     // of declaring constructor
-    constructor(public postsService: PostService) { }
+    constructor(public postsService: PostService, private authService: AuthService) { }
 
     ngOnInit() {
         this.isLoading = true;
@@ -38,6 +42,11 @@ export class PostListComponent implements OnInit, OnDestroy {
                 this.totalPosts = refreshedPosts.postCount;
                 // Once you update this.posts, you DON'T need to separately emit a changePosts event like you do in service file
                 this.posts = refreshedPosts.posts;
+            });
+        this.isloggedIn = this.authService.getIsAuthenticated();
+        this.authStatusSubs = this.authService.getAuthStatusListener()
+            .subscribe(authStatus => {
+                this.isloggedIn = authStatus;
             });
     }
 
@@ -51,6 +60,7 @@ export class PostListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.postSubs.unsubscribe();
+        this.authStatusSubs.unsubscribe();
     }
 
     onDelete(postId: string) {
@@ -68,9 +78,9 @@ export class PostListComponent implements OnInit, OnDestroy {
 
         //** A More intelligent solution is as below */
         this.postsService.deletePost(postId)
-        .subscribe(() => {
-            this.postsService.getPosts(this.postsPerPage, this.currentPage);
-        });
+            .subscribe(() => {
+                this.postsService.getPosts(this.postsPerPage, this.currentPage);
+            });
         // Also no need to use .subscribe() method for getPosts(...) as the postsService.getPostUpdateListener()
         // is already being subscribed to in the ngOnInit() method.
 

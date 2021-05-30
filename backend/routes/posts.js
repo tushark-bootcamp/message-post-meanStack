@@ -1,15 +1,16 @@
 const path = require("path");
 const express = require("express");
 const multer = require("multer");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
 const Post = require("../models/post");
 
 const MIME_TYPE_MAP = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/jpg': 'jpg'
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg"
 };
 
 // ** Imp Note: This function does not create the image directory automatically. 
@@ -18,7 +19,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const isValid = MIME_TYPE_MAP[file.mimetype];
     let error = new Error("Invalid mime type");
-    if(isValid) {
+    if (isValid) {
       error = null;
     }
     // The path "backend/images" is stored relative to the server.js file
@@ -27,64 +28,69 @@ const storage = multer.diskStorage({
     // https://stackoverflow.com/questions/48418680/enoent-no-such-file-or-directory/48653921#48653921
     // To be able to create a folder on fly without having to pre-create
     //cb(error, path.join(__dirname, "/images"));
-    
+
   },
   filename: (req, file, cb) => {
-    const name = file.originalname.toLowerCase().split(' ').join('-');
+    const name = file.originalname.toLowerCase().split(" ").join("-");
     const ext = MIME_TYPE_MAP[file.mimetype];
-    cb(null, name + '-' + Date.now() + '.' + ext);
+    cb(null, name + "-" + Date.now() + "." + ext);
   }
 })
 
-router.post("", multer({storage: storage}).single("image"), (req, res, next) => {
-  const url = req.protocol + '://' + req.get("host");
-  // can instantiate Post() as below because of the model() method from mongoose (@See mongoose.model('Post', postSchema))
-  // the model(..) method gives us the constructor function which allows us to construct a new javascript object --> new Post()
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-    imagePath: url + "/images/" + req.file.filename
-  });
-  post.save().then(createdPost => {
-    console.log(post);
-    res.status(201).json({
-      message: "Post added successfully",
-      // post: {
-      //   id: createdPost._id,
-      //   title: createdPost.title,
-      //   content: createdPost.content,
-      //   imagePath: createdPost.imagePath
-      // }
-      post: {
-        ...createdPost,
-        id: createdPost._id,
-      }
+router.post("", checkAuth, multer({storage: storage }).single("image"), (req, res, next) => {
+    const url = req.protocol + "://" + req.get("host");
+    // can instantiate Post() as below because of the model() method from mongoose (@See mongoose.model("Post", postSchema))
+    // the model(..) method gives us the constructor function which allows us to construct a new javascript object --> new Post()
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: url + "/images/" + req.file.filename
+    });
+    post.save().then(createdPost => {
+      console.log(post);
+      res.status(201).json({
+        message: "Post added successfully",
+        // post: {
+        //   id: createdPost._id,
+        //   title: createdPost.title,
+        //   content: createdPost.content,
+        //   imagePath: createdPost.imagePath
+        // }
+        post: {
+          ...createdPost,
+          id: createdPost._id,
+        }
+      });
     });
   });
-});
 
-router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) => {
-  let imagePath = req.body.imagePath;
-  if(req.file) {
-    const url = req.protocol + '://' + req.get("host");
-    imagePath = url + "/images/" + req.file.filename
-  } 
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.content,
-    imagePath: imagePath
-  });
-  Post.updateOne({
-    _id: req.params.id
-  }, post).then(updatedPost => {
-    console.log(updatedPost);
-    res.status(200).json({
-      message: "Post updated successfully",
-      imagePath: updatedPost.imagePath
+router.put(
+  "/:id",
+  checkAuth,
+  multer({
+    storage: storage
+  }).single("image"), (req, res, next) => {
+    let imagePath = req.body.imagePath;
+    if (req.file) {
+      const url = req.protocol + "://" + req.get("host");
+      imagePath = url + "/images/" + req.file.filename
+    }
+    const post = new Post({
+      _id: req.body.id,
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: imagePath
+    });
+    Post.updateOne({
+      _id: req.params.id
+    }, post).then(updatedPost => {
+      console.log(updatedPost);
+      res.status(200).json({
+        message: "Post updated successfully",
+        imagePath: updatedPost.imagePath
+      });
     });
   });
-});
 
 router.get("", (req, res, next) => {
   // sample url to send query params
@@ -96,23 +102,23 @@ router.get("", (req, res, next) => {
   let fetchedPosts;
   // the below find() method only gets executed when you call the .then()
   const postQuery = Post.find();
-  if(pageSize && currentPage) {
+  if (pageSize && currentPage) {
     postQuery
-    .skip(pageSize * (currentPage - 1))
-    .limit(pageSize);
+      .skip(pageSize * (currentPage - 1))
+      .limit(pageSize);
   }
   postQuery.then(documents => {
-    console.log(documents);
-    fetchedPosts = documents;
-    return Post.count();
-  })
-  .then(count => {
-    res.status(200).json({
-      message: 'Posts fetched successfully',
-      posts: fetchedPosts,
-      postCount: count
+      console.log(documents);
+      fetchedPosts = documents;
+      return Post.count();
+    })
+    .then(count => {
+      res.status(200).json({
+        message: "Posts fetched successfully",
+        posts: fetchedPosts,
+        postCount: count
+      });
     });
-  });
 });
 
 router.get("/:id", (req, res, next) => {
@@ -122,21 +128,21 @@ router.get("/:id", (req, res, next) => {
       res.status(200).json(post);
     } else {
       res.status(404).json({
-        message: 'No post with id: ' + req.params.id + ' found'
+        message: "No post with id: " + req.params.id + " found"
       });
     }
 
   });
 });
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", checkAuth, (req, res, next) => {
   console.log(req.params.id);
   Post.deleteOne({
     _id: req.params.id
   }).then((result) => {
     console.log(result);
     res.status(200).json({
-      message: 'Post deleted'
+      message: "Post deleted"
     });
   });
 });

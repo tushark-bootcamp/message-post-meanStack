@@ -12,7 +12,7 @@
             >
         </div>
         <p>{{post.content}}</p>
-        <mat-action-row>
+        <mat-action-row *ngIf="isloggedIn">
             <a
                 mat-button
                 color="primary"

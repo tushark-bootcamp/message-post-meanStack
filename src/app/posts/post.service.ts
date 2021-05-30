@@ -70,6 +70,8 @@ export class PostService {
             //     }
             // }))
             .subscribe((responseData) => {
+                console.log('response from create post');
+                console.log(responseData);
                 //** Imp Note: The below code to emit change post event is commented off since we navigate 
                 // back to the root where we reload the posts by calling the getPosts() method from the ngOnInit() method of the post-list.component */
 

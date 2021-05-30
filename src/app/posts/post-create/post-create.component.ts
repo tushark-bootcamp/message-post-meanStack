@@ -65,6 +65,7 @@ export class PostCreateComponent implements OnInit {
         if (this.postForm.invalid) {
             return;
         }
+        console.log('mode === create');
         if (this.mode === 'create') {
             // const postCreate: Post = {
             //     id: null,
