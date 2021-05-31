@@ -22,6 +22,8 @@ export class PostListComponent implements OnInit, OnDestroy {
     pageSizeOptions = [1, 2, 5, 10];
     private postSubs: Subscription;
 
+    userId: string;
+
     isloggedIn = false;
     private authStatusSubs: Subscription;
 
@@ -44,9 +46,14 @@ export class PostListComponent implements OnInit, OnDestroy {
                 this.posts = refreshedPosts.posts;
             });
         this.isloggedIn = this.authService.getIsAuthenticated();
+        // The userId is explicitly initialised outside the .subscribe() as this component may not have been initialised
+        // at the time when login event emitted the userId. 
+        this.userId = this.authService.getUserId();
         this.authStatusSubs = this.authService.getAuthStatusListener()
             .subscribe(authStatus => {
                 this.isloggedIn = authStatus;
+                // Re initialise the userId to update new userId if a different user logs in the same browser session 
+                this.userId = this.authService.getUserId();
             });
     }
 

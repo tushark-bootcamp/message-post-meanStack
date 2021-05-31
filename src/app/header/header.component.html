@@ -3,9 +3,13 @@
         <a routerLink="/">My Posts</a>
     </span>
     <span class="spacer"></span>
+    <span *ngIf="isloggedIn">
+        <p>You are loggedin as {{userName}}</p>
+    </span>
+    <span class="spacer"></span>
     <ul>
         <li *ngIf="isloggedIn">
-            <a mat-button routerLink="/create" routerLinkActive="mat-accent">New Posts</a>
+            <a mat-button routerLink="/create" routerLinkActive="mat-accent">New Post</a>
         </li>
         <li *ngIf="!isloggedIn">
             <a mat-button routerLink="/login" routerLinkActive="mat-accent">Login</a>

@@ -41,7 +41,7 @@ export class PostCreateComponent implements OnInit {
                 this.postsService.getPost(this.postId)
                     .pipe(
                         map((serverPost) => {
-                            const post: Post = { id: serverPost._id, title: serverPost.title, content: serverPost.content, imagePath: serverPost.imagePath };
+                            const post: Post = { id: serverPost._id, title: serverPost.title, content: serverPost.content, imagePath: serverPost.imagePath, creator: serverPost.creator };
                             return post;
                         }))
                     .subscribe(post => {
