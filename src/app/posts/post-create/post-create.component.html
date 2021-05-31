@@ -10,8 +10,6 @@
                 matInput
                 type="text"
                 formControlName="title"
-                required
-                minlength="3"
                 placeholder="Post Title"
             >
             <mat-error *ngIf="postForm.get('title').invalid">Please enter a post title</mat-error>

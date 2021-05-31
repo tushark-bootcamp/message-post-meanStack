@@ -37,6 +37,7 @@ const storage = multer.diskStorage({
   }
 })
 
+// checkAuth is the middleware introduced to decode the token and insert userId and user email in the request object
 router.post("", checkAuth, multer({storage: storage }).single("image"), (req, res, next) => {
     const url = req.protocol + "://" + req.get("host");
     // can instantiate Post() as below because of the model() method from mongoose (@See mongoose.model("Post", postSchema))
