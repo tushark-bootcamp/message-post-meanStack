@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Post } from '../post.model';
 import { PostService } from '../post.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { AuthService } from '../../auth/auth.service';
 
@@ -17,10 +17,11 @@ export class PostListComponent implements OnInit, OnDestroy {
     posts: Post[] = [];
     isLoading = false;
     totalPosts = 0;
-    postsPerPage = 2;
+    postsPerPage = 10;
     currentPage = 1;
     pageSizeOptions = [1, 2, 5, 10];
     private postSubs: Subscription;
+    //private postPageListener = new Subject<{postsPerPage: number, currentPage: number}>();
 
     userId: string;
 
@@ -63,7 +64,12 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.postsPerPage = pageData.pageSize;
         this.currentPage = pageData.pageIndex + 1;
         this.postsService.getPosts(this.postsPerPage, this.currentPage);
+        //this.postPageListener.next({postsPerPage: this.postsPerPage, currentPage: this.currentPage});
     }
+
+    // getPostPageListener() {
+    //     return this.postPageListener.asObservable();
+    // }
 
     ngOnDestroy() {
         this.postSubs.unsubscribe();

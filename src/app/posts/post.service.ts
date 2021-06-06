@@ -1,20 +1,35 @@
 import { Injectable } from '@angular/core';
 import { Post } from './post.model';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { PostSocketService } from './post-socket.service';
+import { AuthService } from '../auth/auth.service';
 
 // {providedIn: 'root'} ensures there is a single instance of PostService i.e. Singleton pattern
 @Injectable({ providedIn: 'root' })
 export class PostService {
     private posts: Post[] = [];
+    
+    private postsPerPage = 10;
+    private currentPage = 1;
 
     private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
 
-    constructor(private http: HttpClient, private router: Router) { }
+    constructor(
+        private http: HttpClient, 
+        private router: Router, 
+        private authService: AuthService
+        //private postSocketService: PostSocketService
+        ) { 
+        // console.log("calling observePostSocket()");
+        // this.observePostSocket();
+    }
 
     getPosts(postsPerPage: number, currentPage: number) {
+        this.postsPerPage = postsPerPage;
+        this.currentPage = currentPage
         const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`
         this.http.get<{ message: string, posts: any, postCount: number }>("http://localhost:3000/api/posts" + queryParams)
             // the below transformation is required to transform the server side Post model
@@ -85,6 +100,7 @@ export class PostService {
                 // }
                 // this.posts.push(post);
                 // this.postsUpdated.next([...this.posts]);
+                //this.postSocketService.emitCreatePostSocket(postData);
                 this.router.navigate(["/"]);
             });
     }
@@ -127,6 +143,7 @@ export class PostService {
                 // updatedPosts[updatedPostIndex] = post;
                 // this.posts = updatedPosts;
                 // this.postsUpdated.next([...this.posts]);
+                //this.postSocketService.emitUpdatePostSocket(postData);
                 this.router.navigate(["/"]);
             });
     }
@@ -134,5 +151,31 @@ export class PostService {
     deletePost(postId: string) {
         return this.http.delete<{ message: string }>('http://localhost:3000/api/posts/' + postId);
     }
+
+    // private observePostSocket() {
+    //     this.postSocketService.receiveCreatePostSocket()
+    //     .subscribe((post: any) => {
+    //       console.log(`Create ${post.id} Post socket received`);
+    //       this.refreshPosts(post);
+    //     });
+       
+    //     this.postSocketService.receiveUpdatePostSocket()
+    //     .subscribe((post: any) => {
+    //       console.log(`Update ${post.id} Post socket received`);
+    //       this.refreshPosts(post);
+    //     });
+       
+    //     this.postSocketService.receiveDeletePostSocket()
+    //     .subscribe((post: any) => {
+    //       console.log(`Delete ${post.id} Post socket received`);
+    //       this.refreshPosts(post);
+    //     });
+    //   }
+       
+    //   private refreshPosts(post: any) {
+    //     if (post.creator != this.authService.getUserId()) {
+    //         this.getPosts(this.postsPerPage, this.currentPage);
+    //     }
+    //   }
 
 }

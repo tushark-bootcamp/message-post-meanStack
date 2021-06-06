@@ -9,19 +9,26 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDialogModule } from '@angular/material/dialog';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { AppComponent } from './app.component';
 import { PostCreateComponent } from './posts/post-create/post-create.component';
 import { HeaderComponent } from './header/header.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
 import { AppRoutingModule } from './app-routing.module';
-import { LoginComponent } from './auth/login/login/login.component';
-import { SignupComponent } from './auth/signup/signup/signup.component';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 import { AuthInterceptor } from './auth/auth-interceptor';
+//import { PostSocketService } from './posts/post-socket.service';
+import { ErrorInterceptor } from './error-interceptor';
+import { ErrorComponent } from './error/error.component';
 
 
-
+// const socketIoConfig: SocketIoConfig = {
+//   url: 'http://localhost:3000', options: {}
+// };
 
 @NgModule({
   declarations: [
@@ -30,7 +37,8 @@ import { AuthInterceptor } from './auth/auth-interceptor';
     HeaderComponent,
     PostListComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -45,9 +53,18 @@ import { AuthInterceptor } from './auth/auth-interceptor';
     MatExpansionModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    HttpClientModule
+    HttpClientModule,
+    MatDialogModule
+    //SocketIoModule.forRoot(socketIoConfig)
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+  providers: [
+    //PostSocketService, 
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+  ],
+  entryComponents: [
+    [ErrorComponent]
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
