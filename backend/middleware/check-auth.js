@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
     next();
   } catch (error) {
     res.status(401).json({
-      message: "Auth failed"
+      message: "You are not authenticated. Please login to start writing posts."
     });
   }
 }

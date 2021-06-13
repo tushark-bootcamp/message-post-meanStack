@@ -23,12 +23,12 @@ router.post("/signup", (req, res, next) => {
           });
         })
         .catch(err => {
+          console.log(err);
           res.status(500).json({
-            error: err
+            message: "It looks like you are already a member. Login to start writing posts."
           })
         });
     });
-
 });
 
 router.post("/login", (req, res, next) => {

@@ -65,26 +65,11 @@ export class PostCreateComponent implements OnInit {
         if (this.postForm.invalid) {
             return;
         }
+        this.isLoading = true;
         console.log('mode === create');
         if (this.mode === 'create') {
-            // const postCreate: Post = {
-            //     id: null,
-            //     title: this.postForm.value.title,
-            //     content: this.postForm.value.content
-            // };
             this.postsService.addPost(this.postForm.value.title, this.postForm.value.content, this.postForm.value.image);
-            // this.postsService.addPost({
-            //     id: null,
-            //     title: form.value.title,
-            //     content: form.value.content
-            // });
         } else if (this.mode === 'edit') {
-            // const postUpdate: Post = {
-            //     id: this.postId,
-            //     title: this.postForm.value.title,
-            //     content: this.postForm.value.content,
-            //     imagePath: null
-            // };
             this.postsService.updatePost(this.postId,
                 this.postForm.value.title,
                 this.postForm.value.content,

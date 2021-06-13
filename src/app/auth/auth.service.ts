@@ -39,6 +39,7 @@ export class AuthService {
     }
 
     createUser(email: string, password: string) {
+        console.log("Creating user");
         const authData: AuthData = {
             email: email,
             password: password

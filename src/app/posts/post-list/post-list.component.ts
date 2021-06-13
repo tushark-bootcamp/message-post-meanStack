@@ -59,6 +59,8 @@ export class PostListComponent implements OnInit, OnDestroy {
     }
 
     onChangedPage(pageData: PageEvent) {
+        // ** Note: If you find a scenario where the isLoading property is not being set to false after changing the page,
+        // See the 
         this.isLoading = true;
         console.log(pageData);
         this.postsPerPage = pageData.pageSize;
@@ -93,6 +95,8 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.postsService.deletePost(postId)
             .subscribe(() => {
                 this.postsService.getPosts(this.postsPerPage, this.currentPage);
+            }, () => {
+                this.isLoading = false;
             });
         // Also no need to use .subscribe() method for getPosts(...) as the postsService.getPostUpdateListener()
         // is already being subscribed to in the ngOnInit() method.

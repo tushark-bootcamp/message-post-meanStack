@@ -48,20 +48,29 @@ router.post("", checkAuth, multer({storage: storage }).single("image"), (req, re
       imagePath: url + "/images/" + req.file.filename,
       creator: req.userData.userId
     });
-    post.save().then(createdPost => {
+    post.save()
+    .then(createdPost => {
       console.log(post);
       res.status(201).json({
         message: "Post added successfully",
+        // Transform the serverside Post to client side post{}.
         // post: {
         //   id: createdPost._id,
         //   title: createdPost.title,
         //   content: createdPost.content,
         //   imagePath: createdPost.imagePath
         // }
+        // Create the clientside post {} using the spread operator.
         post: {
           ...createdPost,
           id: createdPost._id,
         }
+      });
+    })
+    .catch( error => {
+      console.log(error);
+      return res.status(500).json({
+        message: "Creating a post failed"
       });
     });
   });
@@ -91,7 +100,8 @@ router.put(
     Post.updateOne({
       _id: req.params.id,
       creator: req.userData.userId
-    }, post).then(updatedPost => {
+    }, post)
+    .then(updatedPost => {
       console.log(updatedPost);
       if(updatedPost.nModified > 0) {
         res.status(200).json({
@@ -100,10 +110,15 @@ router.put(
         });
       } else {
         res.status(401).json({
-          message: "Not authorised"
+          message: "You are not authorised"
         });
       }
-      
+    })
+    .catch( error => {
+      console.log(error);
+      return res.status(500).json({
+        message: "Couldn't update post!"
+      });
     });
   });
 
@@ -128,25 +143,38 @@ router.get("", (req, res, next) => {
       return Post.count();
     })
     .then(count => {
+      console.log(count);
       res.status(200).json({
         message: "Posts fetched successfully",
         posts: fetchedPosts,
         postCount: count
       });
+    })
+    .catch( error => {
+      console.log(error);
+      return res.status(500).json({
+        message: "Fetching posts failed!"
+      });
     });
 });
 
 router.get("/:id", (req, res, next) => {
-  Post.findById(req.params.id).then(post => {
+  Post.findById(req.params.id)
+  .then(post => {
     if (post) {
       console.log(post);
       res.status(200).json(post);
     } else {
       res.status(404).json({
-        message: "No post with id: " + req.params.id + " found"
+        message: "The requested post: " + req.params.id + " was not found!"
       });
     }
-
+  })
+  .catch( error => {
+    console.log(error);
+    return res.status(500).json({
+      message: "Fetching post failed!"
+    });
   });
 });
 
@@ -154,17 +182,24 @@ router.delete("/:id", checkAuth, (req, res, next) => {
   console.log(req.params.id);
   Post.deleteOne({
     _id: req.params.id
-  }).then((result) => {
+  })
+  .then((result) => {
     console.log(result);
     if(result.n > 0) {
       res.status(200).json({
-        message: "Post deleted",
+        message: "Deletion successful!",
       });
     } else {
       res.status(401).json({
         message: "Not authorised"
       });
     }
+  })
+  .catch( error => {
+    console.log(error);
+    return res.status(500).json({
+      message: "Coundn't delete post!"
+    });
   });
 });
 
