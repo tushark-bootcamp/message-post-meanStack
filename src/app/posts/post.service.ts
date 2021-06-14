@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Post } from './post.model';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { PostSocketService } from './post-socket.service';
+//import { PostSocketService } from './post-socket.service';
 import { AuthService } from '../auth/auth.service';
 
 // {providedIn: 'root'} ensures there is a single instance of PostService i.e. Singleton pattern

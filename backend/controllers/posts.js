@@ -60,7 +60,7 @@ exports.createPost = (req, res, next) => {
     }, post)
     .then(updatedPost => {
       console.log(updatedPost);
-      if(updatedPost.nModified > 0) {
+      if(updatedPost.n > 0) {
         res.status(200).json({
           message: "Post updated successfully",
           imagePath: updatedPost.imagePath
