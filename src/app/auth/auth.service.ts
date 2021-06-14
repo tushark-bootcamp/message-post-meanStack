@@ -4,6 +4,9 @@ import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthData } from './auth-data.model';
+import { environment } from '../../environments/environment'
+
+const BACKEND_URL = environment.apiUrl + "/user";
 
 // {providedIn: 'root'} ensures there is a single instance of AuthService i.e. Singleton pattern
 @Injectable({ providedIn: 'root' })
@@ -44,7 +47,7 @@ export class AuthService {
             email: email,
             password: password
         };
-        this.http.post<{ message: string, user: User }>("http://localhost:3000/api/user/signup", authData)
+        this.http.post<{ message: string, user: User }>(BACKEND_URL + "/signup", authData)
             .subscribe(respData => {
                 console.log(respData);
                 this.login(email, password);
@@ -60,7 +63,7 @@ export class AuthService {
             email: email,
             password: password
         };
-        this.http.post<{ token: string, expiresIn: number, userId: string, userName: string}>("http://localhost:3000/api/user/login", authData)
+        this.http.post<{ token: string, expiresIn: number, userId: string, userName: string}>(BACKEND_URL + "/login", authData)
             .subscribe(respData => {
                 console.log(respData);
                 const token = respData.token;

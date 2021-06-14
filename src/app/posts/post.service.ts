@@ -6,6 +6,9 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 //import { PostSocketService } from './post-socket.service';
 import { AuthService } from '../auth/auth.service';
+import { environment } from '../../environments/environment'
+
+const BACKEND_URL = environment.apiUrl + "/posts";
 
 // {providedIn: 'root'} ensures there is a single instance of PostService i.e. Singleton pattern
 @Injectable({ providedIn: 'root' })
@@ -31,7 +34,7 @@ export class PostService {
         this.postsPerPage = postsPerPage;
         this.currentPage = currentPage
         const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`
-        this.http.get<{ message: string, posts: any, postCount: number }>("http://localhost:3000/api/posts" + queryParams)
+        this.http.get<{ message: string, posts: any, postCount: number }>(BACKEND_URL + queryParams)
             // the below transformation is required to transform the server side Post model
             // defined in backend/models/post.js where mongoose creates an additional _id field by default.
             .pipe(map((responseData) => {
@@ -63,7 +66,7 @@ export class PostService {
 
     getPost(id: string) {
         //return { ...this.posts.find(p => p.id === postId) }
-        return this.http.get<{ _id: string, title: string, content: string, imagePath: string, creator: string }>('http://localhost:3000/api/posts/' + id);
+        return this.http.get<{ _id: string, title: string, content: string, imagePath: string, creator: string }>(BACKEND_URL + "/" + id);
     }
 
     addPost(title: string, content: string, image: File) {
@@ -74,7 +77,7 @@ export class PostService {
         postData.append("title", title);
         postData.append("content", content);
         postData.append('image', image, title);
-        this.http.post<{ message: string, post: Post }>('http://localhost:3000/api/posts', postData)
+        this.http.post<{ message: string, post: Post }>(BACKEND_URL, postData)
             // Alternate way to send the transformedPost with an id to .subscriber().    
             // .pipe(map((postMongData) => {
             //     console.log(postMongData.message);
@@ -124,7 +127,7 @@ export class PostService {
                 creator: null
             }
         }
-        this.http.put<{ message: string, imagePath: string }>('http://localhost:3000/api/posts/' + id, postData)
+        this.http.put<{ message: string, imagePath: string }>(BACKEND_URL + "/" + id, postData)
             .subscribe((responseData) => {
                 //** Imp Note: The below code to emit change post event is commented off since we navigate 
                 // back to the root where we reload the posts by calling the getPosts() method from the ngOnInit() method of the post-list.component */
@@ -149,7 +152,7 @@ export class PostService {
     }
 
     deletePost(postId: string) {
-        return this.http.delete<{ message: string }>('http://localhost:3000/api/posts/' + postId);
+        return this.http.delete<{ message: string }>(BACKEND_URL + "/" + postId);
     }
 
     // private observePostSocket() {
