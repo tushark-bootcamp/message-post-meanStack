@@ -17,7 +17,7 @@ const MIME_TYPE_MAP = {
         error = null;
       }
       // The path "backend/images" is stored relative to the server.js file
-      cb(error, "backend/images");
+      cb(error, "images");
       // Refer link
       // https://stackoverflow.com/questions/48418680/enoent-no-such-file-or-directory/48653921#48653921
       // To be able to create a folder on fly without having to pre-create

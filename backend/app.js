@@ -28,7 +28,7 @@ app.use(express.urlencoded({
 }));
 
 // The below line ensures the image folder is accessible over http
-app.use("/images", express.static(path.join("backend/images")));
+app.use("/images", express.static(path.join("images")));
 
 
 app.use((req, res, next) => {
